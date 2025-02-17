@@ -1,0 +1,114 @@
+{
+    "benefits_admin": {
+      "order": 4,
+      "title": "Benefits Administration",
+      "description": "Managing employee benefits programs and processes",
+      "topics": [
+        {
+          "id": "ba_001",
+          "title": "Benefits Overview",
+          "content": [
+            "Health insurance plans",
+            "Retirement benefits",
+            "Leave benefits",
+            "Additional perks",
+            "Enrollment procedures"
+          ],
+          "resources": [
+            "Benefits guide",
+            "Enrollment forms",
+            "Process flowcharts"
+          ],
+          "tasks": [
+            "Review benefits packages",
+            "Practice enrollment process",
+            "Complete benefits calculator training"
+          ],
+          "assessment": {
+            "type": "mixed",
+            "components": [
+              {
+                "type": "quiz",
+                "weight": 60
+              },
+              {
+                "type": "practical",
+                "weight": 40
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "recruitment": {
+      "order": 5,
+      "title": "Recruitment and Hiring",
+      "description": "Full-cycle recruitment process and best practices",
+      "topics": [
+        {
+          "id": "rc_001",
+          "title": "Recruitment Fundamentals",
+          "content": [
+            "Job posting creation",
+            "Resume screening",
+            "Interview process",
+            "Candidate assessment",
+            "Offer letters"
+          ],
+          "resources": [
+            "Recruitment handbook",
+            "Interview templates",
+            "Assessment rubrics"
+          ],
+          "tasks": [
+            "Create sample job posting",
+            "Conduct mock interviews",
+            "Practice offer letter creation"
+          ],
+          "assessment": {
+            "type": "project",
+            "requirements": [
+              "Complete full recruitment cycle simulation",
+              "Create recruitment process documentation"
+            ]
+          }
+        }
+      ]
+    },
+    "performance_mgmt": {
+      "order": 6,
+      "title": "Performance Management",
+      "description": "Employee performance evaluation and development",
+      "topics": [
+        {
+          "id": "pm_001",
+          "title": "Performance Review Process",
+          "content": [
+            "Setting objectives",
+            "Performance metrics",
+            "Review procedures",
+            "Development planning",
+            "Documentation requirements"
+          ],
+          "resources": [
+            "Performance review templates",
+            "Goal-setting guides",
+            "Development plan samples"
+          ],
+          "tasks": [
+            "Practice writing performance reviews",
+            "Create development plans",
+            "Role-play review meetings"
+          ],
+          "assessment": {
+            "type": "portfolio",
+            "requirements": [
+              "Complete performance review documentation",
+              "Development plan creation",
+              "Review meeting simulation"
+            ]
+          }
+        }
+      ]
+    }
+  }
