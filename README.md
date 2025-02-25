@@ -87,6 +87,13 @@ streamlit run app.py
 
 3. Access the application in your web browser at `http://localhost:8501`
 
+
+## 📌 MongoDB Integration
+We have implemented MongoDB for document storage and retrieval.
+
+📌 **[View Full Documentation](docs/mongodb-integration.md)**
+
+
 ## Usage Guide
 
 ### For Administrators

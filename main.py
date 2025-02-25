@@ -3,7 +3,9 @@ import os
 from typing import List, Dict
 from datetime import datetime
 import json
+from pymongo import MongoClient
 from groq import Groq
+
 
 class OnboardingSystem:
     def __init__(self):
@@ -12,44 +14,54 @@ class OnboardingSystem:
         )
         self.learning_paths = self._load_learning_paths()
 
+    def _load_learning_paths(self) -> dict:
+        """Load HR document content from MongoDB"""
+        learning_paths = {}
 
-    def _load_learning_paths(self) -> Dict:
-        """Load predefined learning paths from JSON files"""
-        try:
-            with open('learning_paths.json', 'r') as f:
-                learning_paths = json.load(f)
-            with open('module_content.json', 'r') as f:
-                module_content = json.load(f)
-                
-            # Merge module content into learning paths
-            for module in module_content:
-                if module not in learning_paths['hr_generalist']['modules']:
-                    learning_paths['hr_generalist']['modules'][module] = module_content[module]
-                    
-            return learning_paths
-        except FileNotFoundError:
-            # Fallback to default structure if files don't exist
-            return {
-                "hr_generalist": {
-                    "modules": [
-                        "company_policies",
-                        "hr_systems",
-                        "employee_relations",
-                        "benefits_admin",
-                        "recruitment",
-                        "performance_mgmt"
-                    ],
-                    "required_completion": 100
-                }
-            }
+        # Connect to MongoDB
+        mongo_client = MongoClient("mongodb://localhost:27017/")
+        db = mongo_client["hr_chatbot"]
+        collection = db["documents"]
+
+        # Retrieve stored HR documents
+        documents = collection.find({})
+        for doc in documents:
+            file_name = doc["file_name"].replace(".docx", "").strip().lower()  # Normalize name
+            learning_paths[file_name] = doc["content"]
+
+        print("📌 LOADED DOCUMENTS:", learning_paths.keys())  # Debug print
+        return learning_paths
+
+    def get_ai_response(self, message: str, context: dict) -> str:
+        """Find the best-matching document for the user query"""
         
-    def get_ai_response(self, message: str, context: Dict) -> str:
-        """Get response from Groq API"""
+        query_lower = message.lower()
+
+        # 🔹 Find the most relevant document based on query keywords
+        matched_doc = None
+        for doc_name in self.learning_paths.keys():
+            if doc_name in query_lower:
+                matched_doc = doc_name
+                break  # Stop at the first match
+
+        if matched_doc is None:
+            return "I'm sorry, but I couldn't find specific information related to your query in our HR documents."
+
+        module_content = self.learning_paths.get(matched_doc, "No information available.")
+
+        print(f"📌 QUERY: {message}")
+        print(f"📌 MATCHED DOCUMENT: {matched_doc}")
+        print(f"📌 DOCUMENT CONTENT (First 500 chars): {module_content[:500]}")
+
+        # Construct system prompt
+        system_prompt = f"""You are an HR onboarding assistant.
+        Here is information from company documents related to {matched_doc}:
+        {module_content}
+        Now answer the following question based on this information:
+        """
+
+        # Call Groq AI
         try:
-            system_prompt = f"""You are an HR onboarding assistant helping with {context['current_module']}.
-            Current progress: {context['progress']}%.
-            Expertise level: {context['expertise_level']}"""
-            
             chat_completion = self.client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": system_prompt},
@@ -59,16 +71,16 @@ class OnboardingSystem:
                 temperature=0.7,
                 max_tokens=1000
             )
-            
             return chat_completion.choices[0].message.content
         except Exception as e:
-            return f"Error: Unable to get response from AI. Please check your API key and connection. Details: {str(e)}"
+            return f"Error fetching response: {str(e)}"
+
 
 class UserSession:
     def __init__(self, user_id: str):
         self.user_id = user_id
         self.progress = self._load_progress()
-        
+
     def _load_progress(self) -> Dict:
         """Load user progress from database (simplified with file storage for now)"""
         try:
@@ -81,29 +93,31 @@ class UserSession:
                 "current_module": "company_policies",
                 "expertise_level": "beginner"
             }
-    
+
     def save_progress(self):
         """Save current progress to storage"""
         with open(f"progress_{self.user_id}.json", "w") as f:
             json.dump(self.progress, f)
 
+
 def initialize_session_state():
     """Initialize all session state variables"""
     if 'onboarding_system' not in st.session_state:
         st.session_state.onboarding_system = OnboardingSystem()
-    
+
     if 'user_session' not in st.session_state:
         st.session_state.user_session = UserSession("test_user")
-    
+
     if 'messages' not in st.session_state:
         st.session_state.messages = []
 
+
 def main():
     st.title("HR Onboarding Assistant")
-    
+
     # Initialize session state
     initialize_session_state()
-    
+
     # Display chat messages
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -113,11 +127,11 @@ def main():
     if prompt := st.chat_input("What would you like to know about your HR role?"):
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
-        
+
         # Show user message immediately
         with st.chat_message("user"):
             st.markdown(prompt)
-        
+
         # Get AI response
         with st.chat_message("assistant"):
             context = {
@@ -125,10 +139,10 @@ def main():
                 "progress": st.session_state.user_session.progress["overall_progress"],
                 "expertise_level": st.session_state.user_session.progress["expertise_level"]
             }
-            
+
             response = st.session_state.onboarding_system.get_ai_response(prompt, context)
             st.markdown(response)
-        
+
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
 
@@ -138,6 +152,7 @@ def main():
         st.progress(st.session_state.user_session.progress["overall_progress"] / 100)
         st.write(f"Current Module: {st.session_state.user_session.progress['current_module']}")
         st.write(f"Completed Modules: {len(st.session_state.user_session.progress['completed_modules'])}")
+
 
 if __name__ == "__main__":
     main()
