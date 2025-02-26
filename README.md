@@ -90,6 +90,13 @@ streamlit run app.py
 
 ## 📌 MongoDB Integration
 We have implemented MongoDB for document storage and retrieval.
+ **Replaced JSON-based retrieval with MongoDB**  
+ **Implemented AI-powered ranking using:**  
+   - **Fuzzy Matching (85%+ confidence required)**
+   - **TF-IDF for keyword importance**
+   - **Semantic Search (Deep Learning embeddings)**
+**Final ranking now prioritizes Semantic Search (70% weight)**  
+**Improved chatbot accuracy for HR role queries** 
 
 📌 **[View Full Documentation](docs/mongodb-integration.md)**
 
