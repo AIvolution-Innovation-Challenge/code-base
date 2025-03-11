@@ -1,159 +1,81 @@
-# HR Onboarding Assistant
+# Revolutionizing Employee Onboarding with AI
 
-A personalized chat-based onboarding tool for HR professionals using Streamlit and Groq AI. This system provides interactive learning paths, progress tracking, and AI-assisted guidance for new HR employees.
+This project is part of [NUS-Guru Network AI Innovation Challenge 2025](https://www.sg-innovationchallenge.org) and aims to transform employee onboarding using AI. The system makes onboarding faster, smarter, and more engaging by leveraging OpenAI's API and vector search with FAISS. Users can upload documents, ask questions, and retrieve AI-generated answers based on the stored content.
 
 ## Features
-
-- 🤖 AI-powered chat interface using Groq API
-- 📚 Structured learning paths for HR roles
-- 📊 Progress tracking and visualization
-- 🎯 Module-based learning approach
-- 💡 Interactive assessments and tasks
-- 📋 Comprehensive HR content modules
+- AI-powered employee onboarding assistance
+- Upload and process PDF and DOCX documents
+- Store and retrieve document embeddings using FAISS
+- Ask AI-powered questions based on stored documents
+- Log and track user interactions and responses
 
 ## Prerequisites
-
-- Python 3.8 or higher
-- Groq API key
-- Git (for version control)
+Ensure you have the following installed:
+- Python 3.8+
+- `pip` (Python package manager)
+- OpenAI API key (set as an environment variable)
 
 ## Installation
+```sh
+# Clone the repository
+git clone <repository-url>
+cd <project-directory>
 
-1. Clone the repository:
-```bash
-git clone [your-repository-url]
-cd hr-onboarding-assistant
-```
-
-2. Create and activate a virtual environment:
-```bash
-# Windows
+# Create and activate a virtual environment
 python -m venv venv
-.\venv\Scripts\activate
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 
-# macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. Install required packages:
-```bash
+# Install required dependencies
 pip install -r requirements.txt
 ```
 
-4. Set up environment variables:
-   - Create a `.env` file in the project root
-   - Add your Groq API key:
-```
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-## Project Structure
-
-```
-hr-onboarding-assistant/
-├── app.py                  # Main application file
-├── learning_paths.json     # Learning path configurations
-├── module_content.json     # Detailed module content
-├── requirements.txt        # Project dependencies
-├── .env                    # Environment variables
-└── progress_files/         # User progress storage
+## Environment Variables
+Ensure the OpenAI API key is set before running the application:
+```sh
+export OPENAI_API_KEY="your-api-key-here"  # On Windows, use `set OPENAI_API_KEY=your-api-key-here`
 ```
 
-## Configuration Files
+## Usage
 
-### requirements.txt
+### 1. Load Data
+Run the following command to start the document upload interface:
+```sh
+streamlit run load_data.py
 ```
-streamlit==1.32.0
-groq==0.4.0
-python-dotenv==1.0.0
+Upload PDF or DOCX files. These will be processed and stored in the SQLite database (`documents.db`).
+
+### 2. Ask Questions
+To query the uploaded documents, run:
+```sh
+streamlit run ask_questions.py
 ```
+This will launch an interactive Q&A interface where users can ask questions and receive AI-generated responses based on the stored documents.
 
-### learning_paths.json and module_content.json
-These files contain the structured content for the HR onboarding program. They define:
-- Learning modules and their order
-- Topic content and resources
-- Assessment criteria
-- Completion requirements
-
-## Running the Application
-
-1. Make sure your virtual environment is activated
-
-2. Start the Streamlit application:
-```bash
-streamlit run app.py
+### 3. Log Responses
+To view and analyze logged interactions, run:
+```sh
+streamlit run answer_questions.py
 ```
+This will allow you to track submitted responses and log AI interactions.
 
-3. Access the application in your web browser at `http://localhost:8501`
+## Database (`documents.db`)
+The SQLite database stores:
+- Processed documents and their embeddings
+- User questions and responses
+- Metadata (timestamps, scores, etc.)
 
-## Usage Guide
-
-### For Administrators
-
-1. **Content Management**:
-   - Modify `learning_paths.json` to adjust learning paths
-   - Update `module_content.json` to modify module content
-   - Changes will be reflected automatically on next app restart
-
-2. **Adding New Modules**:
-   - Add new module definitions to `module_content.json`
-   - Update learning paths in `learning_paths.json` to include new modules
-   - Follow existing JSON structure for consistency
-
-3. **Monitoring Progress**:
-   - User progress is stored in `progress_files/`
-   - Each user has a separate progress file
-   - Progress can be reset by deleting the respective file
-
-### For Users
-
-1. **Getting Started**:
-   - Launch the application
-   - Enter your questions or concerns in the chat interface
-   - The AI assistant will guide you through your onboarding journey
-
-2. **Navigation**:
-   - Use the sidebar to track your progress
-   - Current module and completion status are always visible
-   - Click through different modules as needed
-
-3. **Completing Modules**:
-   - Follow the AI assistant's guidance
-   - Complete all required tasks in each module
-   - Take assessments when prompted
-   - Progress is automatically saved
-
-## Troubleshooting
-
-1. **API Key Issues**:
-   - Verify your Groq API key in the `.env` file
-   - Ensure the environment variable is loaded correctly
-   - Check API key permissions and quota
-
-2. **Application Errors**:
-   - Confirm all dependencies are installed
-   - Verify JSON files are properly formatted
-   - Check progress file permissions
-
-3. **Common Solutions**:
-   - Restart the application
-   - Clear browser cache
-   - Recreate virtual environment
-   - Update dependencies
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+## Dependencies
+The following key libraries are used:
+- `Streamlit` (for UI components)
+- `sqlite3` (for database storage)
+- `LangChain` (for document processing and vector search)
+- `FAISS` (for fast retrieval of relevant document segments)
+- `HuggingFaceEmbeddings` (for embeddings generation)
+- `OpenAI API` (for question-answering)
 
 ## License
+This project is licensed under the MIT License.
 
-[Your chosen license]
+## Acknowledgments
+Special thanks to OpenAI and Hugging Face for their NLP capabilities.
 
-## Support
-
-For support, please [contact information or link to support resources]

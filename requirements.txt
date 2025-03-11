@@ -1,3 +1,11 @@
-echo "streamlit==1.32.0
-groq==0.4.0
-python-dotenv==1.0.0" > requirements.txt
+streamlit
+sqlite3
+openai
+langchain_community
+langchain_huggingface
+faiss-cpu
+tempfile
+python-dotenv
+datetime
+json
+os
