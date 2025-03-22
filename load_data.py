@@ -61,10 +61,11 @@ def run_upload_data():
             "You are an expert in creating multiple-choice questions for training purposes. "
             "Based on the provided text, generate 10 multiple-choice questions. "
             "Each question must include four answer options labeled A, B, C, and D, and clearly indicate "
-            "the correct answer. Format your response as a JSON list of objects, where each object has the keys: "
-            "'question', 'options', and 'answer'.\n"
+            "the correct answer. Format your response strictly as a JSON list of objects, where each object has the keys: "
+            "'question', 'options', and 'answer'. Do not include any other text, explanations, or formatting outside of this JSON structure.\n"
             "For example:\n"
-            '[{"question": "What is ...?", "options": {"A": "...", "B": "...", "C": "...", "D": "..."}, "answer": "A"}, ...]'
+            '[{"question": "What is ...?", "options": {"A": "...", "B": "...", "C": "...", "D": "..."}, "answer": "A"}, ...]\n'
+            "Please ensure that your response is **only** in the following JSON format without any extra explanation."
         )
         
         user_message = f"Document text:\n{doc_text}\n\nPlease generate the questions."
