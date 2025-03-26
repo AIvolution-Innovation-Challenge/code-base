@@ -52,6 +52,27 @@ cursor.execute('''
     )
 ''')
 
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TEXT,
+        user_id TEXT,
+        page TEXT,
+        action TEXT,
+        details TEXT
+    )
+''')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS mistakes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT,
+        question TEXT,
+        correct_answer TEXT,
+        user_answer TEXT,
+        timestamp TEXT
+    )
+''')
+
 conn.commit()
 
 from ask_questions import run_ask_questions as run_chatbot_module
