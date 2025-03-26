@@ -192,10 +192,6 @@ st.markdown("---")
 st.caption("Built by Team AIvolution | NUS-Guru Innovation Challenge 2025")
 
 # Embed ElevenLabs Conversational AI Widget
-
-
-
-
 if "user_role" in st.session_state and st.session_state.user_role == "employee":
     components.html(
     """
