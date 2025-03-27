@@ -6,9 +6,14 @@ import plotly.express as px
 from datetime import datetime
 from wordcloud import WordCloud
 
-def run_dashboard():
-    #st.image("aivolution_logo.jpeg", width=200)
+def run_dashboard(logger):
     st.title("Your HR Onboarding Dashboard")
+    logger.log_event(
+        user_id=st.session_state.username,
+        page="HR Dashboard",
+        action="Accessed Dashboard",
+        details="User accessed the HR Dashboard."
+    )
     conn = sqlite3.connect("documents.db")
 
     def load_data():
@@ -18,9 +23,13 @@ def run_dashboard():
             chat_logs = pd.read_sql_query("SELECT * FROM chat_logs", conn)
         except:
             chat_logs = pd.DataFrame()
-        return results, questions, chat_logs
+        try:
+            logs = pd.read_sql_query("SELECT * FROM logs", conn)  # Load logs data
+        except:
+            logs = pd.DataFrame()
+        return results, questions, chat_logs, logs
 
-    results_df, questions_df, chat_logs_df = load_data()
+    results_df, questions_df, chat_logs_df, logs_df = load_data()
 
     roles = results_df['business_role'].unique().tolist()
     selected_role = st.sidebar.selectbox("Filter by Role", ["All"] + roles)
@@ -102,4 +111,12 @@ def run_dashboard():
         else:
             st.warning("No data available for this role.")
 
-    #st.markdown("---")
+    with st.sidebar:
+        selected_tab = st.radio("Select Tab", ["Overview", "Quiz Analytics", "Chat Insights", "Document Stats", "Per Role Analysis", "Activity Logs"])
+
+    if selected_tab == "Activity Logs":
+        st.subheader("Activity Logs")
+        if not logs_df.empty:
+            st.dataframe(logs_df)  # Display logs as a table
+        else:
+            st.info("No activity logs available.")
