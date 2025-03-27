@@ -82,7 +82,10 @@ from hr_dashboard import run_dashboard
 from answer_questions import run_quiz_module
 
 # Page config
-st.set_page_config(page_title="AIvolution | HR Onboarding Platform", layout="wide")
+st.set_page_config(
+        page_title="AIvolution | HR Onboarding Platform", 
+        layout="wide",
+        page_icon="aivolution_icon.png")
 st.image("aivolution_logo.jpeg", width=280)
 
 # Styling for aligned, uppercase, wide buttons
