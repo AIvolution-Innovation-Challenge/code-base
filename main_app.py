@@ -3,6 +3,11 @@ from groq import Groq
 import os
 import sqlite3
 import streamlit.components.v1 as components
+from init_db import init_db
+from ask_questions import run_ask_questions as run_chatbot_module
+from load_data import run_upload_data
+from hr_dashboard import run_dashboard
+from answer_questions import run_quiz_module
 
 # Set environment variables
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -11,53 +16,9 @@ os.environ["GROQ_API_KEY"] = "gsk_zh3S1ZIeEf1trRi1LknfWGdyb3FYgEKtMnmgqLYiHLotEX
 # Initialize Groq client
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
-# Connect to (or create) the SQLite database and create tables if they don't exist
-conn = sqlite3.connect('documents.db', check_same_thread=False)
-cursor = conn.cursor()
+# Initialize and get database connection + cursor
+conn, cursor = init_db()
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS processed_docs (
-        id INTEGER PRIMARY KEY,
-        page_content TEXT,
-        metadata TEXT,
-        business_role TEXT
-    )
-''')
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS questions (
-        id INTEGER PRIMARY KEY,
-        document_title TEXT,
-        business_role TEXT,
-        question TEXT,
-        options TEXT,
-        answer TEXT
-    )
-''')
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS results (
-        id INTEGER PRIMARY KEY,
-        document_title TEXT,
-        business_role TEXT,
-        score INTEGER,
-        total INTEGER,
-        submission_time TEXT
-    )
-''')
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        role TEXT NOT NULL
-    )
-''')
-
-conn.commit()
-
-from ask_questions import run_ask_questions as run_chatbot_module
-from load_data import run_upload_data
-from hr_dashboard import run_dashboard
-from answer_questions import run_quiz_module
 
 # Page config
 st.set_page_config(page_title="AIvolution | HR Onboarding Platform", layout="wide")
@@ -189,18 +150,29 @@ else:
 
 # Footer
 st.markdown("---")
-st.caption("Built by Team AIvolution | NUS-Guru Innovation Challenge 2025")
+st.caption("Built by Team AIvolution | NUS-GURU Network AI Innovation Challenge 2025")
 
 # Embed ElevenLabs Conversational AI Widget
 
 
+# if "user_role" in st.session_state and st.session_state.user_role == "employee":
+#     components.html(
+#     """
+#     <elevenlabs-convai agent-id="WibiIDKxQ3zFxpbZ5A6z"></elevenlabs-convai>
+#     <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+#     """,
+#     height= 200  # You can adjust the height depending on your layout
+# )
 
-
-if "user_role" in st.session_state and st.session_state.user_role == "employee":
-    components.html(
-    """
-    <elevenlabs-convai agent-id="WibiIDKxQ3zFxpbZ5A6z"></elevenlabs-convai>
-    <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
-    """,
-    height= 200  # You can adjust the height depending on your layout
-)
+# if (
+#     "user_role" in st.session_state and 
+#     st.session_state.user_role == "employee" and 
+#     st.session_state.page == "chat"
+# ):
+#     components.html(
+#         """
+#         <elevenlabs-convai agent-id="WibiIDKxQ3zFxpbZ5A6z"></elevenlabs-convai>
+#         <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+#         """,
+#         height=200
+#     )
