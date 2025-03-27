@@ -1,2 +1,4 @@
 .DS_store
 __pycache__
+documents.db
+faiss_index
