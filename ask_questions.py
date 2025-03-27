@@ -111,7 +111,7 @@ def initialize_session_state(client):
         except Exception:
             st.warning("FAISS index not found. Please ensure it's generated correctly.")
 
-def run_ask_questions(client):
+def run_ask_questions(client, logger):
     st.title("Your HR Onboarding Assistant")
     initialize_session_state(client)
     
@@ -127,9 +127,24 @@ def run_ask_questions(client):
         
         context = {"business_role": st.session_state.user_session.progress["business_role"]}
         
+        logger.log_event(
+            user_id=st.session_state.username,
+            page="AI Assistant",
+            action="User Query",
+            details=f"Query: {prompt}"
+        )
+        
         with st.chat_message("assistant"):
             response = st.session_state.onboarding_system.get_ai_response(prompt, context)
             st.markdown(response)
+        
+        logger.log_event(
+            user_id=st.session_state.username,
+            page="AI Assistant",
+            action="AI Response",
+            details=f"Response: {response}"
+        )
+        
         st.session_state.messages.append({"role": "assistant", "content": response})
     
     with st.sidebar:

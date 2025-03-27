@@ -3,6 +3,7 @@ from groq import Groq
 import os
 import sqlite3
 import streamlit.components.v1 as components
+from logger import AppLogger
 
 # Set environment variables
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -35,7 +36,7 @@ cursor.execute('''
 ''')
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS results (
-        id INTEGER PRIMARY KEY,
+        id TEXT PRIMARY KEY,  -- Changed from INTEGER PRIMARY KEY to TEXT PRIMARY KEY
         document_title TEXT,
         business_role TEXT,
         score INTEGER,
@@ -49,6 +50,27 @@ cursor.execute('''
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         role TEXT NOT NULL
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TEXT,
+        user_id TEXT,
+        page TEXT,
+        action TEXT,
+        details TEXT
+    )
+''')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS mistakes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT,
+        question TEXT,
+        correct_answer TEXT,
+        user_answer TEXT,
+        timestamp TEXT
     )
 ''')
 
@@ -164,6 +186,9 @@ def logout():
     st.session_state.page = "login"
     st.success("You have been logged out successfully.")
 
+# Initialize logger
+logger = AppLogger()
+
 # Main content routing
 if st.session_state.page == "login":
     login_page()
@@ -176,26 +201,22 @@ else:
         logout()
 
     if st.session_state.page == "upload":
-        run_upload_data(conn, cursor, client)
+        run_upload_data(conn, cursor, client, logger)
 
     elif st.session_state.page == "chat":
-        run_chatbot_module(client)
+        run_chatbot_module(client, logger)
 
     elif st.session_state.page == "quiz":
-        run_quiz_module(conn, cursor)
+        run_quiz_module(conn, cursor, logger)
 
     elif st.session_state.page == "dashboard":
-        run_dashboard()
+        run_dashboard(logger)
 
 # Footer
 st.markdown("---")
 st.caption("Built by Team AIvolution | NUS-Guru Innovation Challenge 2025")
 
 # Embed ElevenLabs Conversational AI Widget
-
-
-
-
 if "user_role" in st.session_state and st.session_state.user_role == "employee":
     components.html(
     """

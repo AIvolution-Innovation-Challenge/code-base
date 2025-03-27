@@ -11,7 +11,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 
-def run_upload_data(conn, cursor, client):
+def run_upload_data(conn, cursor, client, logger):
     st.title("Welcome! Upload training documents for your employees here")
     st.write("Upload your PDF or DOCX files by dragging and dropping them below.")
 
@@ -94,6 +94,15 @@ def run_upload_data(conn, cursor, client):
                             d.metadata["source"] = uploaded_file.name
                         documents.extend(docs)
             
+            # Log document upload event
+            for uploaded_file in uploaded_files:
+                logger.log_event(
+                    user_id=st.session_state.username,
+                    page="Upload Docs",
+                    action="Uploaded Document",
+                    details=f"Document: {uploaded_file.name}, Role: {business_role}"
+                )
+            
             # Split documents into chunks and create a FAISS vector store
             text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=600,
@@ -115,6 +124,14 @@ def run_upload_data(conn, cursor, client):
             conn.commit()
             st.success("Documents processed and stored successfully!")
             
+            # Log document processing event
+            logger.log_event(
+                user_id=st.session_state.username,
+                page="Upload Docs",
+                action="Processed Documents",
+                details=f"Processed {len(uploaded_files)} documents for role: {business_role}"
+            )
+            
             # Combine full text for each uploaded document (grouped by file/source)
             combined_texts = {}
             for doc in documents:
@@ -133,6 +150,12 @@ def run_upload_data(conn, cursor, client):
             st.session_state.all_questions = all_questions
         else:
             st.warning("Please upload at least one file.")
+            logger.log_event(
+                user_id=st.session_state.username,
+                page="Upload Docs",
+                action="No Documents Uploaded",
+                details="User attempted to process without uploading files."
+            )
 
     # Display generated questions if they exist in session state
     if "all_questions" in st.session_state:
