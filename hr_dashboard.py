@@ -110,13 +110,3 @@ def run_dashboard(logger):
             st.plotly_chart(fig5, use_container_width=True)
         else:
             st.warning("No data available for this role.")
-
-    with st.sidebar:
-        selected_tab = st.radio("Select Tab", ["Overview", "Quiz Analytics", "Chat Insights", "Document Stats", "Per Role Analysis", "Activity Logs"])
-
-    if selected_tab == "Activity Logs":
-        st.subheader("Activity Logs")
-        if not logs_df.empty:
-            st.dataframe(logs_df)  # Display logs as a table
-        else:
-            st.info("No activity logs available.")
