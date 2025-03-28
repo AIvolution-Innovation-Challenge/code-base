@@ -4,6 +4,12 @@ import os
 import sqlite3
 import streamlit.components.v1 as components
 from logger import AppLogger
+from db_utils import get_connection, initialize_database
+from ask_questions import run_ask_questions as run_chatbot_module
+from load_data import run_upload_data
+from hr_dashboard import run_dashboard
+from answer_questions import run_quiz_module
+
 
 # Set environment variables
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -12,74 +18,11 @@ os.environ["GROQ_API_KEY"] = "gsk_zh3S1ZIeEf1trRi1LknfWGdyb3FYgEKtMnmgqLYiHLotEX
 # Initialize Groq client
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
-# Connect to (or create) the SQLite database and create tables if they don't exist
-conn = sqlite3.connect('documents.db', check_same_thread=False)
-cursor = conn.cursor()
+# Connect to the SQLite database and initialize tables
+conn = get_connection()
+conn, cursor = initialize_database(conn)
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS processed_docs (
-        id INTEGER PRIMARY KEY,
-        page_content TEXT,
-        metadata TEXT,
-        business_role TEXT
-    )
-''')
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS questions (
-        id INTEGER PRIMARY KEY,
-        document_title TEXT,
-        business_role TEXT,
-        question TEXT,
-        options TEXT,
-        answer TEXT
-    )
-''')
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS results (
-        id TEXT PRIMARY KEY,  -- Changed from INTEGER PRIMARY KEY to TEXT PRIMARY KEY
-        document_title TEXT,
-        business_role TEXT,
-        score INTEGER,
-        total INTEGER,
-        submission_time TEXT
-    )
-''')
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        role TEXT NOT NULL
-    )
-''')
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        timestamp TEXT,
-        user_id TEXT,
-        page TEXT,
-        action TEXT,
-        details TEXT
-    )
-''')
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS mistakes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT,
-        question TEXT,
-        correct_answer TEXT,
-        user_answer TEXT,
-        timestamp TEXT
-    )
-''')
-
-conn.commit()
-
-from ask_questions import run_ask_questions as run_chatbot_module
-from load_data import run_upload_data
-from hr_dashboard import run_dashboard
-from answer_questions import run_quiz_module
 
 # Page config
 st.set_page_config(
@@ -217,7 +160,7 @@ else:
 
 # Footer
 st.markdown("---")
-st.caption("Built by Team AIvolution | NUS-Guru Innovation Challenge 2025")
+st.caption("Built by Team AIvolution | NUS-GURU Network AI Innovation Challenge 2025")
 
 # Embed ElevenLabs Conversational AI Widget
 if "user_role" in st.session_state and st.session_state.user_role == "employee":
