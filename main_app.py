@@ -23,7 +23,6 @@ conn = get_connection()
 conn, cursor = initialize_database(conn)
 
 
-
 # Page config
 st.set_page_config(
         page_title="AIvolution | HR Onboarding Platform", 
@@ -87,6 +86,7 @@ def handle_login(username, password, role):
                 st.session_state.page = "chat"
 
             st.success(f"Welcome {username}!")
+            st.rerun()
         else:
             st.error("Role mismatch or incorrect password. Please try again.")
     else:
@@ -99,10 +99,12 @@ def nav_button(label, page_key):
             st.markdown('<div class="active-tab">', unsafe_allow_html=True)
             if st.button(label.upper(), key=page_key):
                 st.session_state.page = page_key
+                st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
     else:
         if st.sidebar.button(label.upper(), key=page_key):
             st.session_state.page = page_key
+            st.rerun()
 
 # Render navigation buttons for pages
 def render_navigation():
@@ -131,6 +133,7 @@ def logout():
     del st.session_state["page"]
     st.session_state.page = "login"
     st.success("You have been logged out successfully.")
+    st.rerun()
 
 # Initialize logger
 logger = AppLogger()

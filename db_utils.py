@@ -41,7 +41,10 @@ def initialize_database(conn):
             id INTEGER PRIMARY KEY,
             username TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
-            role TEXT NOT NULL
+            system_role TEXT NOT NULL,
+            business_role TEXT NOT NULL,
+            department TEXT,
+            start_date TEXT
         )
     ''')
     cursor.execute('''
@@ -64,6 +67,15 @@ def initialize_database(conn):
             timestamp TEXT
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT
+        )
+    ''')
+    cursor.execute("SELECT * FROM settings WHERE key = 'quiz_deadline_days'")
+    if cursor.fetchone() is None:
+        cursor.execute("INSERT INTO settings (key, value) VALUES (?, ?)", ("quiz_deadline_days", "7"))
 
     conn.commit()
     return conn, cursor

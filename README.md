@@ -2,80 +2,97 @@
 
 This project is part of [NUS-Guru Network AI Innovation Challenge 2025](https://www.sg-innovationchallenge.org) and aims to transform employee onboarding using AI. The system makes onboarding faster, smarter, and more engaging by leveraging OpenAI's API and vector search with FAISS. Users can upload documents, ask questions, and retrieve AI-generated answers based on the stored content.
 
-## Features
-- AI-powered employee onboarding assistance
-- Upload and process PDF and DOCX documents
-- Store and retrieve document embeddings using FAISS
-- Ask AI-powered questions based on stored documents
-- Log and track user interactions and responses
+---
 
-## Prerequisites
-Ensure you have the following installed:
+## 🚀 Features
+
+- 📊 **Dashboard Overview**: Visual summary of quizzes, scores, documents, and chats.
+- 📁 **Document & Quiz Compliance**: Track pending or overdue document completions.
+- 💬 **Chat Insights**: Analyze chat activity and common user queries.
+- 🧑‍💼 **Per Role Analysis**: Deep dive into quiz scores by job role.
+- 🧠 **Quiz Analytics**: Score trends by department and document.
+- 🧪 **SQLite Database** backend for storing users, quiz data, chat logs, and system logs.
+
+---
+
+## 🏗️ File Structure
+
+```
+📁 HR-Onboarding/
+├── main_app.py              # Entry point for Streamlit app
+├── hr_dashboard.py          # Contains the dashboard layout and logic
+├── ask_questions.py         # Handles quiz/question serving
+├── answer_questions.py      # Handles quiz submission and scoring
+├── load_data.py             # Utility for loading documents and user data
+├── db_utils.py              # DB helper functions (CRUD ops, settings)
+├── logger.py                # Event logger for tracking user actions
+├── seed_dummy_data.py       # Script to seed initial users, questions, etc.
+└── documents.db             # SQLite database storing all app data
+```
+
+---
+
+## ⚙️ Requirements
+
 - Python 3.8+
-- `pip` (Python package manager)
-- OpenAI API key (set as an environment variable)
+- Streamlit
+- pandas
+- numpy
+- plotly
+- sqlite3 (standard with Python)
+- (Optional) `python-dotenv` if using environment variables
 
-## Installation
-```sh
-# Clone the repository
-git clone <repository-url>
-cd <project-directory>
+Install dependencies using:
 
-# Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-
-# Install required dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-## Environment Variables
-Ensure the OpenAI API key is set before running the application:
-```sh
-export OPENAI_API_KEY="your-api-key-here"  # On Windows, use `set OPENAI_API_KEY=your-api-key-here`
+---
+
+## 🧪 Setting Up Locally
+
+1. **Clone the repo**
+```bash
+git clone https://github.com/your-username/hr-onboarding-dashboard.git
+cd hr-onboarding-dashboard
 ```
 
-## Usage
-
-### 1. Load Data
-Run the following command to start the document upload interface:
-```sh
-streamlit run load_data.py
+2. **(Optional)** Seed the database with dummy data
+```bash
+python seed_dummy_data.py
 ```
-Upload PDF or DOCX files. These will be processed and stored in the SQLite database (`documents.db`).
 
-### 2. Ask Questions
-To query the uploaded documents, run:
-```sh
-streamlit run ask_questions.py
+3. **Run the Streamlit App**
+```bash
+streamlit run main_app.py
 ```
-This will launch an interactive Q&A interface where users can ask questions and receive AI-generated responses based on the stored documents.
 
-### 3. Log Responses
-To view and analyze logged interactions, run:
-```sh
-streamlit run answer_questions.py
-```
-This will allow you to track submitted responses and log AI interactions.
+---
 
-## Database (`documents.db`)
-The SQLite database stores:
-- Processed documents and their embeddings
-- User questions and responses
-- Metadata (timestamps, scores, etc.)
+## 🧠 How It Works
 
-## Dependencies
-The following key libraries are used:
-- `Streamlit` (for UI components)
-- `sqlite3` (for database storage)
-- `LangChain` (for document processing and vector search)
-- `FAISS` (for fast retrieval of relevant document segments)
-- `HuggingFaceEmbeddings` (for embeddings generation)
-- `OpenAI API` (for question-answering)
+- Users are loaded into the system with their start dates, departments, and business roles.
+- Each role has associated documents (and quizzes).
+- The dashboard helps track:
+  - Which users haven't completed their required documents.
+  - Quiz scores by role and department.
+  - Commonly asked chat queries.
+- The backend uses SQLite with various tables like:
+  - `users`, `questions`, `results`, `chat_logs`, `logs`, `settings`
 
-## License
-This project is licensed under the MIT License.
+---
 
-## Acknowledgments
-Special thanks to OpenAI and Hugging Face for their NLP capabilities.
+## 🔒 Security & Logging
 
+- All major interactions are logged using the `logger.py` module.
+- Chat logs and quiz scores are stored against user IDs.
+- No PII is processed externally; all operations are local to the app instance.
+
+---
+
+## 📬 Feedback / Contributions
+
+If you find a bug or have a feature request, feel free to open an issue or submit a pull request!
+
+---
