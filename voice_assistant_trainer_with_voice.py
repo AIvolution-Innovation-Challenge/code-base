@@ -15,7 +15,7 @@ import scenarios
 
 # Variable setup
 scenario = scenarios.customer_service_agent_support_scenario
-MAX_DIALOGUES = 12
+MAX_DIALOGUES = 6
 AI_VOICE = "af_heart"
 EVALUATION_VOICE = "am_michael"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -24,7 +24,7 @@ os.environ["GROQ_API_KEY"] = "gsk_zh3S1ZIeEf1trRi1LknfWGdyb3FYgEKtMnmgqLYiHLotEX
 # ----------------------- Speech-to-Text Setup -----------------------
 SAMPLE_RATE = 16000
 THRESHOLD = 700
-SILENCE_DURATION = 5
+SILENCE_DURATION = 2
 MAX_RECORD_TIME = 30
 MAX_CHUNK_LENGTH = 100
 

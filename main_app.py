@@ -9,6 +9,9 @@ from ask_questions import run_ask_questions as run_chatbot_module
 from load_data import run_upload_data
 from hr_dashboard import run_dashboard
 from answer_questions import run_quiz_module
+from customise_questions_scenarios import run_assignments
+from scenario_trainer import run_conversation_module
+from add_scenario import run_generate_scenario_module
 
 
 # Set environment variables
@@ -72,7 +75,7 @@ def handle_login(username, password, role):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
     # Retrieve all user records
-    cursor.execute("SELECT username, password, role FROM users")
+    cursor.execute("SELECT username, password, system_role FROM users")
     rows = cursor.fetchall()
     dummy_users = {username: {"password": password, "role": role} for username, password, role in rows}
     conn.close()
@@ -114,9 +117,12 @@ def render_navigation():
     if st.session_state.user_role == 'admin':
         nav_button("Upload Docs", "upload")
         nav_button("HR Dashboard", "dashboard")
+        nav_button("Assign lessons", "assign")
+        nav_button("Generate Scenarios", "generate")
     elif st.session_state.user_role == 'employee':
         nav_button("AI Assistant", "chat")
         nav_button("Take Quiz", "quiz")
+        nav_button("Practice Scenario", "scenario")
 
 # Main login page
 def login_page():
@@ -161,8 +167,17 @@ else:
     elif st.session_state.page == "quiz":
         run_quiz_module(conn, cursor, logger)
 
+    elif st.session_state.page == "scenario":
+        run_conversation_module(conn, cursor, logger)
+
     elif st.session_state.page == "dashboard":
         run_dashboard(logger)
+
+    elif st.session_state.page == "assign":
+        run_assignments(conn, cursor, logger)
+
+    elif st.session_state.page == "generate":
+        run_generate_scenario_module(conn, cursor, logger)
 
 # Footer
 st.markdown("---")

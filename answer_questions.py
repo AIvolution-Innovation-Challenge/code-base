@@ -118,4 +118,4 @@ def run_quiz_module(conn, cursor, logger):
         
         if st.button("Refresh Progress"):
             st.session_state.user_session.progress = st.session_state.user_session._load_progress()
-            st.experimental_rerun()
+            st.rerun()
