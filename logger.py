@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 
 class AppLogger:
-    def __init__(self, db_path="documents.db"):
+    def __init__(self, db_path="database.db"):
         self.db_path = db_path
         self._initialize_db()
 

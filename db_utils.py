@@ -2,7 +2,7 @@
 
 import sqlite3
 
-def get_connection(db_name='documents.db'):
+def get_connection(db_name='database.db'):
     return sqlite3.connect(db_name, check_same_thread=False)
 
 def initialize_database(conn):

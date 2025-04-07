@@ -68,12 +68,15 @@ if "page" not in st.session_state:
 
 # Function to handle user login with hardcoded users
 def handle_login(username, password, role):
-    # Hardcoded dummy users
-    dummy_users = {
-        "admin": {"password": "admin", "role": "admin"},
-        "employee": {"password": "employee", "role": "employee"}
-    }
-    
+    # Connect to the database
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    # Retrieve all user records
+    cursor.execute("SELECT username, password, role FROM users")
+    rows = cursor.fetchall()
+    dummy_users = {username: {"password": password, "role": role} for username, password, role in rows}
+    conn.close()
+
     if username in dummy_users:
         if dummy_users[username]["password"] == password and dummy_users[username]["role"] == role:
             st.session_state.user_role = dummy_users[username]["role"]

@@ -174,7 +174,7 @@ def run_upload_data(conn, cursor, client, logger):
     # Button to save selected questions to the database
     if st.button("Save Selected Questions"):
         # Re-open (or create) the database and ensure the questions table exists
-        conn = sqlite3.connect('documents.db')
+        conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS questions (

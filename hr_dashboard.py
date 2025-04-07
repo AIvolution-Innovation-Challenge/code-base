@@ -44,7 +44,7 @@ def run_dashboard(logger):
         details="User accessed the HR Dashboard."
     )
 
-    conn = sqlite3.connect("documents.db")
+    conn = sqlite3.connect("database.db")
 
     def load_data():
         results = pd.read_sql_query("SELECT * FROM results", conn)
