@@ -174,10 +174,10 @@ else:
         run_dashboard(logger)
 
     elif st.session_state.page == "assign":
-        run_assignments(conn, cursor, logger)
+        run_assignments(conn, cursor, client, logger)
 
     elif st.session_state.page == "generate":
-        run_generate_scenario_module(conn, cursor, logger)
+        run_generate_scenario_module(conn, cursor)
 
 # Footer
 st.markdown("---")

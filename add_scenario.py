@@ -43,7 +43,7 @@ cursor.execute("""
 """)
 conn.commit()
 
-def run_generate_scenario_module(conn, cursor, logger):
+def run_generate_scenario_module(conn, cursor):
     st.title("Customer Service Agent Support Scenario Input")
     
     # --- Generate Scenario with AI Section ---

@@ -11,10 +11,8 @@ import re
 from groq import Groq
 import soundfile as sf
 from kokoro import KPipeline
-import scenarios
 
 # Variable setup
-scenario = scenarios.customer_service_agent_support_scenario
 MAX_DIALOGUES = 6
 AI_VOICE = "af_heart"
 EVALUATION_VOICE = "am_michael"
