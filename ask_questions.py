@@ -68,7 +68,7 @@ class UserSession:
             ["Business Analyst", "Data Scientist", "Manager", "Other"], 
             index=0
         )
-        conn = sqlite3.connect("documents.db")
+        conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
         cursor.execute(
             "SELECT DISTINCT metadata FROM processed_docs WHERE business_role = ?", 

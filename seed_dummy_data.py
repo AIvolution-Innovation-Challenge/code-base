@@ -4,7 +4,7 @@ import random
 import uuid
 from datetime import datetime, timedelta
 
-conn = sqlite3.connect("documents.db")
+conn = sqlite3.connect("database.db")
 cursor = conn.cursor()
 
 # Create required tables

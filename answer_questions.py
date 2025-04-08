@@ -7,42 +7,46 @@ from ask_questions import UserSession
 def run_quiz_module(conn, cursor, logger):
     st.title("Please complete your onboarding quizzes below")
 
-    # Fetch all available quizzes
-    cursor.execute("SELECT DISTINCT document_title, business_role FROM questions")
-    all_documents = cursor.fetchall()
+    # 1. Fetch assigned quizzes for the current user from the assignments table.
+    cursor.execute("SELECT quizzes FROM assignments WHERE user_id = ?", (st.session_state.username,))
+    row = cursor.fetchone()
+    if row:
+        # Assuming the 'quizzes' column is stored as a JSON list of quiz names.
+        assigned_quizzes = json.loads(row[0])
+    else:
+        assigned_quizzes = []
 
-    # Fetch completed quizzes for the current user
+    # 2. Fetch completed quizzes for the current user from the results table (only those with full marks).
     cursor.execute("""
         SELECT DISTINCT document_title FROM results
-        WHERE business_role = ? AND id LIKE ? AND score = total
-    """, (st.session_state.user_session.progress["business_role"], f"{st.session_state.username}_%"))
+        WHERE id LIKE ? AND score = total
+    """, (f"{st.session_state.username}_%",))
     completed_documents = {row[0] for row in cursor.fetchall()}
 
-    # Separate available and completed quizzes
-    available_documents = [doc for doc in all_documents if doc[0] not in completed_documents]
+    # Filter out quizzes that are already completed.
+    available_quizzes = [quiz for quiz in assigned_quizzes if quiz not in completed_documents]
 
-    if not available_documents:
+    if not available_quizzes:
         st.info("No quiz available. All quizzes have been completed.")
     else:
         st.write("Select quiz to take:")
-        doc_options = {doc[0]: doc[1] for doc in available_documents}
-        selected_doc = st.selectbox("Document", list(doc_options.keys()))
+        selected_quiz = st.selectbox("Quiz", available_quizzes)
 
         if st.button("Load Quiz"):
             cursor.execute(
                 "SELECT id, question, options, answer FROM questions WHERE document_title = ?",
-                (selected_doc,)
+                (selected_quiz,)
             )
             quiz_questions = cursor.fetchall()
             if quiz_questions:
                 st.session_state.quiz_loaded = True
-                st.session_state.selected_doc = selected_doc
+                st.session_state.selected_quiz = selected_quiz
                 st.session_state.quiz_questions = quiz_questions
             else:
-                st.info("No questions found for the selected document.")
+                st.info("No questions found for the selected quiz.")
 
         if st.session_state.get("quiz_loaded", False):
-            st.header(f"Quiz for {st.session_state.selected_doc}")
+            st.header(f"Quiz for {st.session_state.selected_quiz}")
             with st.form(key="quiz_form"):
                 user_answers = {}
                 for q in st.session_state.quiz_questions:
@@ -59,7 +63,7 @@ def run_quiz_module(conn, cursor, logger):
                 if submitted:
                     total = len(st.session_state.quiz_questions)
                     score = 0
-                    mistakes = []  # Track mistakes
+                    mistakes = []
                     for q in st.session_state.quiz_questions:
                         q_id, question_text, options_json, correct_answer = q
                         user_answer = user_answers.get(q_id)
@@ -72,7 +76,6 @@ def run_quiz_module(conn, cursor, logger):
                                 "user_answer": user_answer
                             })
                     
-                    # Log mistakes if any
                     if mistakes:
                         logger.log_mistakes(
                             user_id=st.session_state.username,
@@ -81,40 +84,38 @@ def run_quiz_module(conn, cursor, logger):
                     
                     st.write(f"Your score: {score} out of {total}")
                     if score == total:
-                        business_role = doc_options[st.session_state.selected_doc]
-                        quiz_id = f"{st.session_state.username}_{st.session_state.selected_doc}"  # Ensure id is a valid string
+                        quiz_id = f"{st.session_state.username}_{st.session_state.selected_quiz}"
                         cursor.execute("""
-                            INSERT INTO results (id, document_title, business_role, score, total, submission_time)
-                            VALUES (?, ?, ?, ?, ?, ?)
-                        """, (quiz_id, st.session_state.selected_doc, business_role, score, total, datetime.now()))
+                            INSERT INTO results (id, document_title, score, total, submission_time)
+                            VALUES (?, ?, ?, ?, ?)
+                        """, (quiz_id, st.session_state.selected_quiz, score, total, datetime.now()))
                         conn.commit()
-                        st.success("Congratulations! Full marks achieved. Document marked as complete.")
-                        st.session_state.user_session.progress
+                        st.success("Congratulations! Full marks achieved. Quiz marked as complete.")
                     else:
                         st.info("Not full marks. Please try again!")
                     logger.log_event(
                         user_id=st.session_state.username,
                         page="Take Quiz",
                         action="Submitted Quiz",
-                        details=f"Document: {st.session_state.selected_doc}, Score: {score}/{total}"
+                        details=f"Quiz: {st.session_state.selected_quiz}, Score: {score}/{total}"
                     )
 
-    # Display completed quizzes
+    # Display completed quizzes.
     if completed_documents:
         st.subheader("Completed Quizzes")
-        for doc in completed_documents:
-            st.write(f"- {doc}")
+        for quiz in completed_documents:
+            st.write(f"- {quiz}")
 
     with st.sidebar:
         st.header("Your Learning Progress")
         progress = st.session_state.user_session.progress
-        st.write(f"Business Role: {progress['business_role']}")
-        st.write(f"Total Documents: {len(progress['all_documents'])}")
-        st.write(f"Completed Documents: {len(progress['completed_modules'])}")
+        # Optionally, you might remove the Business Role display if it's no longer relevant.
+        # st.write(f"Business Role: {progress['business_role']}")
+        st.write(f"Total Quizzes: {len(progress['all_documents'])}")
+        st.write(f"Completed Quizzes: {len(progress['completed_modules'])}")
         st.progress(progress["overall_progress"] / 100)
         st.write(f"Overall Progress: {progress['overall_progress']:.2f}%")
         
-        # Add a button to refresh the progress
         if st.button("Refresh Progress"):
             st.session_state.user_session.progress = st.session_state.user_session._load_progress()
-            st.experimental_rerun()
+            st.rerun()
